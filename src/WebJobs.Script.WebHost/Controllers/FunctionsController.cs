@@ -35,10 +35,12 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
         private readonly ILogger _logger;
         private static readonly Regex FunctionNameValidationRegex = new Regex(@"^[a-z][a-z0-9_\-]{0,127}$(?<!^host$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public FunctionsController(IWebFunctionsManager functionsManager, WebScriptHostManager scriptHostManager, ILoggerFactory loggerFactory)
+        public FunctionsController(IWebFunctionsManager functionsManager, ILoggerFactory loggerFactory)
         {
             _functionsManager = functionsManager;
-            _scriptHostManager = scriptHostManager;
+
+            // TODO: DI (FACAVAL) replace dependency
+            _scriptHostManager = null;
             _logger = loggerFactory?.CreateLogger(ScriptConstants.LogCategoryFunctionsController);
         }
 
