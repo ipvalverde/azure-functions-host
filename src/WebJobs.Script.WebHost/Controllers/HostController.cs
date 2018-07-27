@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.WebApiCompatShim;
 using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Azure.WebJobs.Script.WebHost.Authentication;
 using Microsoft.Azure.WebJobs.Script.WebHost.Filters;
 using Microsoft.Azure.WebJobs.Script.WebHost.Management;
@@ -31,13 +30,13 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
     /// </summary>
     public class HostController : Controller
     {
-        private readonly ScriptWebHostOptions _webHostSettings;
+        private readonly IOptions<ScriptWebHostOptions> _webHostSettings;
         private readonly IOptions<JobHostOptions> _hostOptions;
         private readonly ILogger _logger;
         private readonly IAuthorizationService _authorizationService;
         private readonly IWebFunctionsManager _functionsManager;
 
-        public HostController(ScriptWebHostOptions webHostSettings,
+        public HostController(IOptions<ScriptWebHostOptions> webHostSettings,
             IOptions<JobHostOptions> hostOptions,
             ILoggerFactory loggerFactory,
             IAuthorizationService authorizationService,
@@ -119,7 +118,7 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
         [EnableDebugMode]
         public IActionResult LaunchDebugger()
         {
-            if (_webHostSettings.IsSelfHost)
+            if (_webHostSettings.Value.IsSelfHost)
             {
                 // If debugger is already running, this will be a no-op returning true.
                 if (Debugger.Launch())
@@ -154,7 +153,7 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
         public IActionResult Restart([FromServices] IScriptHostManager hostManager)
         {
             Task ignore = hostManager.RestartHostAsync();
-            return Ok(_webHostSettings);
+            return Ok(_webHostSettings.Value);
         }
 
         [HttpGet]

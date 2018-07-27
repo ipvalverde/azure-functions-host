@@ -204,6 +204,11 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost
                 s.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, FileMonitoringService>());
             });
 
+            // If there is a script host builder registered, allow it to configure
+            // the host builder
+            var scriptBuilder = _rootServiceProvider.GetService<IScriptHostBuilder>();
+            scriptBuilder?.Configure(builder);
+
             return builder.Build();
         }
 
