@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.WebApiCompatShim;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Azure.WebJobs.Script.WebHost.Authentication;
 using Microsoft.Azure.WebJobs.Script.WebHost.Filters;
 using Microsoft.Azure.WebJobs.Script.WebHost.Management;
@@ -20,6 +21,7 @@ using Microsoft.Azure.WebJobs.Script.WebHost.Security.Authorization.Policies;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using HttpHandler = Microsoft.Azure.WebJobs.IAsyncConverter<System.Net.Http.HttpRequestMessage, System.Net.Http.HttpResponseMessage>;
 
 namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
 {
@@ -29,21 +31,18 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
     /// </summary>
     public class HostController : Controller
     {
-        private readonly WebScriptHostManager _scriptHostManager;
         private readonly ScriptWebHostOptions _webHostSettings;
         private readonly IOptions<JobHostOptions> _hostOptions;
         private readonly ILogger _logger;
         private readonly IAuthorizationService _authorizationService;
         private readonly IWebFunctionsManager _functionsManager;
 
-        public HostController(WebScriptHostManager scriptHostManager,
-            ScriptWebHostOptions webHostSettings,
+        public HostController(ScriptWebHostOptions webHostSettings,
             IOptions<JobHostOptions> hostOptions,
             ILoggerFactory loggerFactory,
             IAuthorizationService authorizationService,
             IWebFunctionsManager functionsManager)
         {
-            _scriptHostManager = scriptHostManager;
             _webHostSettings = webHostSettings;
             _hostOptions = hostOptions;
             _logger = loggerFactory.CreateLogger(ScriptConstants.LogCategoryHostController);
@@ -55,17 +54,17 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
         [Route("admin/host/status")]
         [Authorize(Policy = PolicyNames.AdminAuthLevelOrInternal)]
         [EnableDebugMode]
-        public IActionResult GetHostStatus()
+        public IActionResult GetHostStatus([FromServices] IScriptHostManager scriptHostManager)
         {
             var status = new HostStatus
             {
-                State = _scriptHostManager.State.ToString(),
+                State = scriptHostManager.State.ToString(),
                 Version = ScriptHost.Version,
                 VersionDetails = Utility.GetInformationalVersion(typeof(ScriptHost)),
                 Id = _hostOptions.Value.HostId
             };
 
-            var lastError = _scriptHostManager.LastError;
+            var lastError = scriptHostManager.LastError;
             if (lastError != null)
             {
                 status.Errors = new Collection<string>();
@@ -152,9 +151,9 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
         [HttpPost]
         [Route("admin/host/restart")]
         [Authorize(Policy = PolicyNames.AdminAuthLevel)]
-        public IActionResult Restart()
+        public IActionResult Restart([FromServices] IScriptHostManager hostManager)
         {
-            _scriptHostManager.RestartHost();
+            Task ignore = hostManager.RestartHostAsync();
             return Ok(_webHostSettings);
         }
 
@@ -163,12 +162,9 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
         [Authorize(AuthenticationSchemes = AuthLevelAuthenticationDefaults.AuthenticationScheme)]
         [RequiresRunningHost]
         [Route("runtime/webhooks/{name}/{*extra}")]
-        public async Task<IActionResult> ExtensionWebHookHandler(string name, CancellationToken token)
+        public async Task<IActionResult> ExtensionWebHookHandler(string name, CancellationToken token, [FromServices] IScriptWebHookProvider provider)
         {
-            var provider = _scriptHostManager.BindingWebHookProvider;
-
-            var handler = provider.GetHandlerOrNull(name);
-            if (handler != null)
+            if (provider.TryGetHandler(name, out HttpHandler handler))
             {
                 string keyName = WebJobsSdkExtensionHookProvider.GetKeyName(name);
                 var authResult = await _authorizationService.AuthorizeAsync(User, keyName, PolicyNames.SystemAuthLevel);
