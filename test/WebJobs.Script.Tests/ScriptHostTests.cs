@@ -1021,66 +1021,6 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             //}
         }
 
-        [Fact(Skip = "Configuration no longer handled by ScriptHost. Validate logic (moved to HostJsonFileConfigurationSource)")]
-        public void Initialize_Sanitizes_HostJsonLog()
-        {
-            //TestLoggerProvider loggerProvider = new TestLoggerProvider();
-            //var loggerProviderFactory = new TestLoggerProviderFactory(loggerProvider, includeDefaultLoggerProviders: false);
-
-            //string rootPath = Path.Combine(Environment.CurrentDirectory, "ScriptHostTests");
-            //if (!Directory.Exists(rootPath))
-            //{
-            //    Directory.CreateDirectory(rootPath);
-            //}
-
-            //// Turn off all logging. We shouldn't see any output.
-            //string hostJsonContent = @"
-            //{
-            //    'functionTimeout': '00:05:00',
-            //    'functions': [ 'FunctionA', 'FunctionB' ],
-            //    'logger': {
-            //        'categoryFilter': {
-            //            'defaultLevel': 'Information'
-            //        }
-            //    },
-            //    'Values': {
-            //        'MyCustomValue': 'abc'
-            //    }
-            //}";
-
-            //File.WriteAllText(Path.Combine(rootPath, "host.json"), hostJsonContent);
-
-            //ScriptHostConfiguration config = new ScriptHostConfiguration()
-            //{
-            //    RootScriptPath = rootPath
-            //};
-
-            //config.HostConfig.HostId = ID;
-            //var environment = new Mock<IScriptHostEnvironment>();
-            //var eventManager = new Mock<IScriptEventManager>();
-
-            //var host = new ScriptHost(environment.Object, eventManager.Object, config, null, loggerProviderFactory, null);
-            //host.Initialize();
-
-            //string hostJsonSanitized = @"
-            //{
-            //    'functionTimeout': '00:05:00',
-            //    'functions': [ 'FunctionA', 'FunctionB' ],
-            //    'logger': {
-            //        'categoryFilter': {
-            //            'defaultLevel': 'Information'
-            //        }
-            //    }
-            //}";
-
-            //// for formatting
-            //var hostJson = JObject.Parse(hostJsonSanitized);
-
-            //var logger = loggerProvider.CreatedLoggers.Single(l => l.Category == LogCategories.Startup);
-            //var logMessage = logger.GetLogMessages().Single(l => l.FormattedMessage.StartsWith("Host configuration file read")).FormattedMessage;
-            //Assert.Equal($"Host configuration file read:{Environment.NewLine}{hostJson}", logMessage);
-        }
-
         [Fact(Skip = "ConfigureLoggerFactory moving (brettsam)")]
         public void ConfigureLoggerFactory_Default()
         {
