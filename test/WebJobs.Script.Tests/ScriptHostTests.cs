@@ -273,170 +273,6 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             asmMock.Verify();
         }
 
-        [Theory]
-        [InlineData("QUEUETriggER.py")]
-        [InlineData("queueTrigger.py")]
-        public void DeterminePrimaryScriptFile_MultipleFiles_SourceFileSpecified(string scriptFileName)
-        {
-            JObject functionConfig = new JObject()
-            {
-                { "scriptFile", scriptFileName }
-            };
-
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\functions\queueTrigger.py", new MockFileData(string.Empty) },
-                { @"c:\functions\helper.py", new MockFileData(string.Empty) },
-                { @"c:\functions\test.txt", new MockFileData(string.Empty) }
-            };
-
-            var fileSystem = new MockFileSystem(files);
-
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            // string scriptFile = ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem);
-            // Assert.Equal(@"c:\functions\queueTrigger.py", scriptFile, StringComparer.OrdinalIgnoreCase);
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_RelativeSourceFileSpecified()
-        {
-            JObject functionConfig = new JObject()
-            {
-                { "scriptFile", @"..\shared\queuetrigger.py" }
-            };
-
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\shared\queueTrigger.py", new MockFileData(string.Empty) },
-                { @"c:\functions\queueTrigger.py", new MockFileData(string.Empty) },
-                { @"c:\functions\helper.py", new MockFileData(string.Empty) },
-                { @"c:\functions\test.txt", new MockFileData(string.Empty) }
-            };
-
-            var fileSystem = new MockFileSystem(files);
-
-            //string scriptFile = ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem);
-            //Assert.Equal(@"c:\shared\queueTrigger.py", scriptFile, StringComparer.OrdinalIgnoreCase);
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_MultipleFiles_ConfigTrumpsConvention()
-        {
-            JObject functionConfig = new JObject()
-            {
-                { "scriptFile", "queueTrigger.py" }
-            };
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\functions\run.py", new MockFileData(string.Empty) },
-                { @"c:\functions\queueTrigger.py", new MockFileData(string.Empty) },
-                { @"c:\functions\helper.py", new MockFileData(string.Empty) },
-                { @"c:\functions\test.txt", new MockFileData(string.Empty) }
-            };
-            var fileSystem = new MockFileSystem(files);
-
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            //string scriptFile = ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem);
-            //Assert.Equal(@"c:\functions\queueTrigger.py", scriptFile);
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_MultipleFiles_NoClearPrimary_ReturnsNull()
-        {
-            var functionConfig = new JObject();
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\functions\foo.py", new MockFileData(string.Empty) },
-                { @"c:\functions\queueTrigger.py", new MockFileData(string.Empty) },
-                { @"c:\functions\helper.py", new MockFileData(string.Empty) },
-                { @"c:\functions\test.txt", new MockFileData(string.Empty) }
-            };
-            var fileSystem = new MockFileSystem(files);
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            //Assert.Throws<ScriptConfigurationException>(() => ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem));
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_NoFiles_ReturnsNull()
-        {
-            var functionConfig = new JObject();
-            string[] functionFiles = new string[0];
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddDirectory(@"c:\functions");
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            // Assert.Throws<ScriptConfigurationException>(() => ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem));
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_MultipleFiles_RunFilePresent()
-        {
-            var functionConfig = new JObject();
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\functions\Run.csx", new MockFileData(string.Empty) },
-                { @"c:\functions\Helper.csx", new MockFileData(string.Empty) },
-                { @"c:\functions\test.txt", new MockFileData(string.Empty) }
-            };
-            var fileSystem = new MockFileSystem(files);
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            //string scriptFile = ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem);
-            //Assert.Equal(@"c:\functions\Run.csx", scriptFile);
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_SingleFile()
-        {
-            var functionConfig = new JObject();
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\functions\Run.csx", new MockFileData(string.Empty) }
-            };
-            var fileSystem = new MockFileSystem(files);
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            //string scriptFile = ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem);
-            //Assert.Equal(@"c:\functions\Run.csx", scriptFile);
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_MultipleFiles_RunTrumpsIndex()
-        {
-            var functionConfig = new JObject();
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\functions\run.js", new MockFileData(string.Empty) },
-                { @"c:\functions\index.js", new MockFileData(string.Empty) },
-                { @"c:\functions\test.txt", new MockFileData(string.Empty) }
-            };
-            var fileSystem = new MockFileSystem(files);
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            //string scriptFile = ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem);
-            //Assert.Equal(@"c:\functions\run.js", scriptFile);
-            throw new Exception("Fix test");
-        }
-
-        [Fact]
-        public void DeterminePrimaryScriptFile_MultipleFiles_IndexFilePresent()
-        {
-            var functionConfig = new JObject();
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\functions\index.js", new MockFileData(string.Empty) },
-                { @"c:\functions\test.txt", new MockFileData(string.Empty) }
-            };
-            var fileSystem = new MockFileSystem(files);
-            // TODO: DI (FACAVAL) This logic has moved to FunctionMetadataManager
-            //string scriptFile = ScriptHost.DeterminePrimaryScriptFile(functionConfig, @"c:\functions", fileSystem);
-            //Assert.Equal(@"c:\functions\index.js", scriptFile);
-            throw new Exception("Fix test");
-        }
-
         [Fact(Skip = "Host.json parsing logic moved to HostJsonFileConfigurationSource. Move test")]
         public void Create_InvalidHostJson_ThrowsInformativeException()
         {
@@ -1185,66 +1021,6 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             //}
         }
 
-        [Fact(Skip = "Configuration no longer handled by ScriptHost. Validate logic (moved to HostJsonFileConfigurationSource)")]
-        public void Initialize_Sanitizes_HostJsonLog()
-        {
-            //TestLoggerProvider loggerProvider = new TestLoggerProvider();
-            //var loggerProviderFactory = new TestLoggerProviderFactory(loggerProvider, includeDefaultLoggerProviders: false);
-
-            //string rootPath = Path.Combine(Environment.CurrentDirectory, "ScriptHostTests");
-            //if (!Directory.Exists(rootPath))
-            //{
-            //    Directory.CreateDirectory(rootPath);
-            //}
-
-            //// Turn off all logging. We shouldn't see any output.
-            //string hostJsonContent = @"
-            //{
-            //    'functionTimeout': '00:05:00',
-            //    'functions': [ 'FunctionA', 'FunctionB' ],
-            //    'logger': {
-            //        'categoryFilter': {
-            //            'defaultLevel': 'Information'
-            //        }
-            //    },
-            //    'Values': {
-            //        'MyCustomValue': 'abc'
-            //    }
-            //}";
-
-            //File.WriteAllText(Path.Combine(rootPath, "host.json"), hostJsonContent);
-
-            //ScriptHostConfiguration config = new ScriptHostConfiguration()
-            //{
-            //    RootScriptPath = rootPath
-            //};
-
-            //config.HostConfig.HostId = ID;
-            //var environment = new Mock<IScriptHostEnvironment>();
-            //var eventManager = new Mock<IScriptEventManager>();
-
-            //var host = new ScriptHost(environment.Object, eventManager.Object, config, null, loggerProviderFactory, null);
-            //host.Initialize();
-
-            //string hostJsonSanitized = @"
-            //{
-            //    'functionTimeout': '00:05:00',
-            //    'functions': [ 'FunctionA', 'FunctionB' ],
-            //    'logger': {
-            //        'categoryFilter': {
-            //            'defaultLevel': 'Information'
-            //        }
-            //    }
-            //}";
-
-            //// for formatting
-            //var hostJson = JObject.Parse(hostJsonSanitized);
-
-            //var logger = loggerProvider.CreatedLoggers.Single(l => l.Category == LogCategories.Startup);
-            //var logMessage = logger.GetLogMessages().Single(l => l.FormattedMessage.StartsWith("Host configuration file read")).FormattedMessage;
-            //Assert.Equal($"Host configuration file read:{Environment.NewLine}{hostJson}", logMessage);
-        }
-
         [Fact(Skip = "ConfigureLoggerFactory moving (brettsam)")]
         public void ConfigureLoggerFactory_Default()
         {
@@ -1476,25 +1252,6 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             Assert.Same(function, functionResult);
         }
 
-        [Theory(Skip = "Moved to FunctionMetadataManager")]
-        [InlineData("")]
-        [InlineData("host")]
-        [InlineData("Host")]
-        [InlineData("-function")]
-        [InlineData("_function")]
-        [InlineData("function test")]
-        [InlineData("function.test")]
-        [InlineData("function0.1")]
-        public void ValidateFunctionName_ThrowsOnInvalidName(string functionName)
-        {
-            var ex = Assert.Throws<InvalidOperationException>(() =>
-            {
-                // ScriptHost.ValidateName(functionName);
-            });
-
-            Assert.Equal(string.Format("'{0}' is not a valid function name.", functionName), ex.Message);
-        }
-
         [Theory]
         [InlineData("myproxy")]
         [InlineData("my proxy")]
@@ -1502,24 +1259,6 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
         public void UpdateProxyName(string proxyName)
         {
             Assert.Equal("myproxy", ScriptHost.NormalizeProxyName(proxyName));
-        }
-
-        [Theory(Skip = "Moved to FunctionMetadataManager")]
-        [InlineData("testwithhost")]
-        [InlineData("hosts")]
-        [InlineData("myfunction")]
-        [InlineData("myfunction-test")]
-        [InlineData("myfunction_test")]
-        public void ValidateFunctionName_DoesNotThrowOnValidName(string functionName)
-        {
-            try
-            {
-                //ScriptHost.ValidateName(functionName);
-            }
-            catch (InvalidOperationException)
-            {
-                Assert.True(false, $"Valid function name {functionName} failed validation.");
-            }
         }
 
 #if WEBROUTING
@@ -1799,6 +1538,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
                     .ConfigureDefaultTestScriptHost(o =>
                     {
                         o.ScriptPath = TestHelpers.FunctionsTestDirectory;
+                        o.LogPath = TestHelpers.GetHostLogFileDirectory().FullName;
                     })
                     .Build();
 
