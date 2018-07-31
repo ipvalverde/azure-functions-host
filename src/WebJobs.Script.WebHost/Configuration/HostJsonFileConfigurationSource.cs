@@ -22,6 +22,11 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Configuration
 
         public HostJsonFileConfigurationSource(IOptions<ScriptWebHostOptions> scriptHostOptions, ILoggerFactory loggerFactory)
         {
+            if (loggerFactory == null)
+            {
+                throw new ArgumentNullException(nameof(loggerFactory));
+            }
+
             HostOptions = scriptHostOptions;
             _logger = loggerFactory.CreateLogger(LogCategories.Startup);
         }
